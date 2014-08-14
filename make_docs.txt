@@ -1,0 +1,1 @@
+jsduck ../ext/src/  common/src/ --output docs

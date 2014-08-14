@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='USGS-common-AGC'>/**
+</span>* @class USGS.common.AGC
+* AGC, kind of a wrapper for ESRI&#39;s ArcGIS Javascript API.
+* @extends Component
+* It uses the DOJO loader &#39;require&#39;, to add some Dojo &amp; ESRI modules, then starts up an ESRI ArcGIS &#39;map&#39; on Dojo &#39;Ready&#39;.
+* It fires a &#39;maploaded&#39; event on map.on(&#39;load&#39;) 
+* It fills the container it is placed in, by default
+*/
+Ext.define(&#39;USGS.common.AGC&#39;, {
+
+<span id='USGS-common-AGC-property-extend'>  /** */
+</span>	extend: &#39;Ext.Component&#39;,
+
+<span id='USGS-common-AGC-property-alias'>  /** */
+</span>	alias: &#39;widget.agc&#39;,
+
+<span id='USGS-common-AGC-property-reference'>  /** */
+</span>  reference: &#39;AGC&#39;,
+
+
+<span id='USGS-common-AGC-property-style'>  /** 
+</span>   * @property style
+   * @property style.height default &#39;100%&#39;
+   * @property style.width  default &#39;100%&#39;
+   * @property style.z-index should be 100
+   *
+   */
+  style: {
+    height:&#39;100%&#39;,
+    width: &#39;100%&#39;,
+    &#39;z-index&#39;: 100
+  },
+
+<span id='USGS-common-AGC-property-layout'>  /** 
+</span>   * @property layout
+   * @property layout.border should be &#39;border&#39;
+   */
+  layout: { type: &#39;border&#39; },
+
+	config:{ // 
+ 
+<span id='USGS-common-AGC-cfg-arcMap'>    /** 
+</span>     * @cfg {a reference to a map} arcMap 
+     * &lt;p&gt;A pointer to &#39;the map&#39;.&lt;/p&gt;
+     * getters &amp; setters: getArcMap(), setArcMap(map)
+     *
+    */
+		arcMap: null,
+
+<span id='USGS-common-AGC-cfg-initialExtent'>    /** 
+</span>     * @cfg {map extent} initialExtent
+     * &lt;p&gt;Initial extent of the map&lt;/p&gt;
+     * { xmin : -19000000, ymin : 1300000, xmax : -3300000, ymax : 7900000 } &lt;br&gt;
+     * getters &amp; setters: getInitialExtent(), setInitialExtent(extent).
+    */
+		initialExtent: null,
+
+<span id='USGS-common-AGC-cfg-fitExtent'>    /** 
+</span>     * @cfg {boolean} fitExtent
+     * &lt;p&gt;Forces extent to fit in Viewport&lt;/p&gt; 
+     */
+    fitExtent: false,
+
+<span id='USGS-common-AGC-cfg-showExtent'>    /** 
+</span>     * @cfg {boolean} showExtent
+     * &lt;p&gt;Shows current extent in console.log&lt;/p&gt; 
+     * helper function shows map extent on map extent-change.
+     */
+    showExtent: false,
+
+<span id='USGS-common-AGC-cfg-scaleBar'>    /** 
+</span>     * @cfg {screenLocation} scaleBar
+     * &lt;p&gt;Shows scaleBar at screenLocation&lt;/p&gt; 
+     * Specify the scalebar position on the map. Valid options are 
+     * &quot;top-right&quot;,&quot;bottom-right&quot;,&quot;top-center&quot;,
+     * &quot;bottom-center&quot;,&quot;bottom-left&quot;,&quot;top-left&quot;. 
+     */
+    scaleBar: null,
+
+<span id='USGS-common-AGC-cfg-overViewMap'>    /** 
+</span>     * @cfg {screenLocation} overViewMap
+     * &lt;p&gt;Shows OverViewMap at screenLocation&lt;/p&gt; 
+     * Specifies which corner of the map to attach the OverviewMap dijit. 
+     * Valid values are: &quot;top-right&quot;,&quot;bottom-right&quot;,&quot;bottom-left&quot; and &quot;top-left&quot;
+     */
+    overViewMap: null,
+
+<span id='USGS-common-AGC-cfg-legend'>    /** 
+</span>     * @cfg {} legend
+     * &lt;p&gt;Shows map legend&lt;/p&gt; 
+     */
+    legend: null,
+
+<span id='USGS-common-AGC-cfg-theLods'>    /** 
+</span>     * @cfg {[0,1,..,16,17]} theLods
+     * &lt;p&gt;Limit map zoom levels to certain levels of detail&lt;/p&gt;
+     * An ArcGISTiledMapServiceLayer has a number of LODs (Levels of Detail). 
+     * Each LOD corresponds to a map at a given scale or resolution. LOD has no constructor.
+     */
+<span id='USGS-common-AGC-cfg-tempLods'>    theLods: null,   // set in view
+</span>
+<span id='USGS-common-AGC-cfg-thePopup'>    tempLods: null,  // local working copy
+</span>    
+    thePopup: null,
+<span id='USGS-common-AGC-cfg-esriPopup'>    esriPopup: true,
+</span>
+<span id='USGS-common-AGC-cfg-showMask'>    /** 
+</span>     * @cfg {boolean} showMask
+     * &lt;p&gt;Shows a loader mask untill shut off, see theMask&lt;/p&gt;
+     */
+    showMask: false,
+
+<span id='USGS-common-AGC-cfg-theMask'>    theMask: null,
+</span>
+<span id='USGS-common-AGC-cfg-theHelpHTML'>    theHelpHTML: null,
+</span>
+<span id='USGS-common-AGC-cfg-theTask'>    /** 
+</span>     * @cfg {task} theTask
+     * &lt;p&gt;Internal config used to control an error message&lt;/p&gt;
+     * 
+     */
+    theTask: null,
+
+<span id='USGS-common-AGC-cfg-wrap180'>    /** 
+</span>     * @cfg {boolean} wrap180
+     * &lt;p&gt;Wrap map at 180 degrees?&lt;/p&gt;
+     * 
+     */
+    wrap180: false,
+
+<span id='USGS-common-AGC-cfg-myGL'>    /** 
+</span>     * @cfg {boolean} myGL
+     * &lt;p&gt;Create/add graphicsLayer to map with an id of &#39;myGL&#39;?&lt;/p&gt;
+     * 
+     */
+    myGL: false
+	},
+
+<span id='USGS-common-AGC-method-initComponent'>  /** 
+</span>   * A property with auto-detected type and name.
+   */
+  initComponent: function() { // sets up task runner &amp; a bunch of dojo.requires
+    var me = this;
+    var task;
+    var runner = new Ext.util.TaskRunner();
+ 
+    this.callParent(); 
+
+    task = runner.newTask({
+      run: me.taskDone,
+      interval: 10000,
+      scope: me
+    });
+
+    this.setTheTask(task);
+    this.getTheTask().start();
+
+    dojo.require(&quot;esri.map&quot;);
+
+    dojo.require(&quot;esri.layers.FeatureLayer&quot;);
+    dojo.require(&quot;esri.layers.agstiled&quot;);
+    dojo.require(&quot;esri.layers.agsdynamic&quot;);
+
+    dojo.require(&quot;esri.tasks.query&quot;);
+    dojo.require(&quot;esri/tasks/IdentifyParameters&quot;);
+
+    dojo.require(&quot;esri.graphic&quot;);
+    dojo.require(&quot;esri.Color&quot;);
+
+    // dojo.require(&quot;dojo.topic&quot;);  
+    // already seems to be a publish/subscribe is available in dojo
+    // dojo.publish(&#39;event&#39;, parameter);
+
+    if (this.getEsriPopup()) {
+      //    console.log(&#39;Esri Popup: &#39;);
+      dojo.require(&quot;esri.dijit.PopupTemplate&quot;);
+      dojo.require(&quot;esri.dijit.Popup&quot;);
+
+      dojo.require(&quot;dojo.parser&quot;);
+    }
+
+    if (this.getLegend() ) {
+      dojo.require(&quot;esri.dijit.Legend&quot;);
+    }
+
+    if (this.getScaleBar() ) {
+      dojo.require(&quot;esri.dijit.Scalebar&quot;);
+    }
+
+    if (this.getOverViewMap() ) {
+      dojo.require(&quot;esri.dijit.OverviewMap&quot;);
+    }
+
+    if ( this.getMyGL() ) {
+      dojo.require(&quot;esri.layers.graphics&quot;);
+    }
+
+  },
+
+
+<span id='USGS-common-AGC-method-taskDone'>  /**     */
+</span>  taskDone: function() {  // should not get here - map did not load!!!
+    //  console.log(&#39;taskDone! this: &#39;, this);
+      var task = this.getTheTask();
+ //     console.log(&#39;taskDone! task: &#39;, task);
+      task.stop();
+      Ext.Msg.alert(&#39;Something is wrong&#39;, &#39;Having trouble getting the map, please try again later&#39;);
+  },
+
+
+<span id='USGS-common-AGC-method-onBoxReady'>  /**     */
+</span>	onBoxReady: function(t, eOpts){
+		var map,  me = this, local_id = this.getId() ;
+
+		function myInit() {
+      me.doSetLODS();
+
+      me.doSetInitExtent();
+
+
+      if (me.getEsriPopup()) {  //setup popup, parse, map w/infoWindow
+      //  console.log(&#39;Esri Popup: onBoxReady, with popup&#39;);
+        me.doSetPopup();
+ 
+        dojo.parser.parse();  // needed for popup placement, make sure dom is ready for map 
+        // http://forums.arcgis.com/threads/94986-Popups-and-Zoom-are-Not-in-Correct-Spot?highlight=popups+zoom
+ 
+        map = new esri.Map(local_id, { // map with infoWindow 
+          basemap: &quot;topo&quot;, 
+          extent: me.getInitialExtent(),
+          fitExtent: me.getFitExtent(),
+          logo: false,
+          showAttribution:false,
+          lods: me.getTempLods(),
+          wrapAround180: me.getWrap180(),
+          infoWindow: me.getThePopup()
+        });
+
+      } else {  // no popup or parse
+        //        console.log(&#39;Esri Popup: onBoxReady no popup&#39;);
+        map = new esri.Map(local_id, {  // map without infoWindow 
+          basemap: &quot;topo&quot;, 
+          extent: me.getInitialExtent(),
+          fitExtent: me.getFitExtent(),
+          logo: false,
+          showAttribution:false,
+          lods: me.getTempLods(),
+          wrapAround180: me.getWrap180()
+        });
+
+      }
+
+      map.on(&quot;load&quot;, function() { // setArcMap, stop task, {scalebar, Overview, Legend, MyGL}, fire &#39;maploaded&#39; event 
+        //console.log(&#39;AGC, map - on load&#39;);
+        me.setArcMap(map);
+
+        if (me.getScaleBar() ) {
+          me.showScalebar();
+        }
+
+        if (me.getOverViewMap() ) {
+          me.showOverViewMap();
+        }
+
+        if (me.getLegend() ) {
+          me.showLegend();
+        }
+
+        if ( me.getMyGL() ) {
+          me.setupMyGL(map);
+        }
+
+        me.getTheTask().stop();
+
+        // seems like only lowercase events are being passed to root controller
+        //        me.fireEvent(&#39;mapLoaded&#39;, map); 
+
+<span id='USGS-common-AGC-event-maploaded'>        /**
+</span>         * @event maploaded
+         * Triggered after map is loaded.
+         * @param {Ext.Component} map a reference to the map
+         * @return {Object} map:
+
+         */          
+        me.fireEvent(&#39;maploaded&#39;, map);
+      });
+
+      // --------------------------------------------------
+
+      if (me.getShowExtent()) {
+        map.on(&quot;extent-change&quot;, function(e){
+          var geo = map.extent;
+          console.log( &#39;xmin :&#39;, geo.xmin.toFixed(3),&#39;, ymin :&#39;, geo.ymin.toFixed(3), &#39;, xmax :&#39;, geo.xmax.toFixed(3), &#39;, ymax :&#39;,geo.ymax.toFixed(3));
+        });
+      }
+
+      if (me.getTheHelpHTML() ) {
+        var help = Ext.ComponentQuery.query(&#39;help&#39;)[0];
+        help.getViewModel().set(&#39;helpHTML&#39;, me.getTheHelpHTML() );
+
+      }
+
+		}  // init
+
+    // console.log(&#39;AGC init&#39;);
+    if (me.getShowMask()) {
+      this.setTheMask( new Ext.LoadMask({
+            msg: &#39;Please wait&#39;,
+            target: this
+          }) 
+      );
+
+      this.getTheMask().show();
+
+    }
+
+    dojo.ready(myInit);
+
+	},  // onBoxReady
+
+<span id='USGS-common-AGC-property-'>/**     */
+</span><span id='USGS-common-AGC-method-onResize'>//	onResize: function( t, height, width, oldWidth, oldHeight, eOpts ) {    // keeps map &amp; screen coordinated
+</span>  onResize: function( width, height, oldWidth, oldHeight) {    // keeps map &amp; screen coordinated, fires &#39;mapresized&#39; event 
+    //        resize( this, width, height, oldWidth, oldHeight, eOpts )
+    // if ( this.getShowExtent() ) {
+    // console.log(&#39;AGC , resize - width:&#39;, width, &#39;, height: &#39;, height, &#39;, oldWidth: &#39;, oldWidth, &#39;, oldHeight: &#39;, oldHeight);
+    // }
+
+    var m = this.getArcMap();
+    var size = {height:height, width:width, oldHeight:oldHeight, oldWidth:oldWidth};
+    
+		if (m) {
+      m.resize(); 
+      // console.log(&#39;AGC, onResize, height: &#39;, height, &#39;, oldHeight: &#39;, oldHeight);
+      // console.log(&#39;AGC, onResize, width: &#39; , width , &#39;, oldWidth: &#39; , oldWidth);
+
+<span id='USGS-common-AGC-event-mapresized'>    /**
+</span>     * @event mapresized
+     * Triggered after map is resized.
+     * @return {Object} Object with properties:
+     * @return {Number} return.width map width.
+     * @return {Number} return.height map height.
+     * @return {Number} return.oldWidth The old map width.
+     * @return {Number} return.oldHeight The old map height.
+     */                	
+      this.fireEvent(&#39;mapresized&#39;, size);
+		}
+  },
+
+<span id='USGS-common-AGC-method-doSetLODS'>/**     */
+</span>  doSetLODS: function() {  // set level of detail 
+    var lods = [
+      { &quot;level&quot;:  0, &quot;resolution&quot;: 156543.033928000,  &quot;scale&quot;: 591657527.591555 },
+      { &quot;level&quot;:  1, &quot;resolution&quot;: 78271.5169639999,  &quot;scale&quot;: 295828763.795777 },
+      { &quot;level&quot;:  2, &quot;resolution&quot;: 39135.7584820001,  &quot;scale&quot;: 147914381.897889 },
+      { &quot;level&quot;:  3, &quot;resolution&quot;: 19567.8792409999,  &quot;scale&quot;: 73957190.948944  },
+      { &quot;level&quot;:  4, &quot;resolution&quot;: 9783.93962049996,  &quot;scale&quot;: 36978595.474472  },
+      { &quot;level&quot;:  5, &quot;resolution&quot;: 4891.96981024998,  &quot;scale&quot;: 18489297.737236  },
+      { &quot;level&quot;:  6, &quot;resolution&quot;: 2445.98490512499,  &quot;scale&quot;: 9244648.868618   },
+      { &quot;level&quot;:  7, &quot;resolution&quot;: 1222.99245256249,  &quot;scale&quot;: 4622324.434309   },
+      { &quot;level&quot;:  8, &quot;resolution&quot;: 611.496226281380,  &quot;scale&quot;: 2311162.217155   },
+      { &quot;level&quot;:  9, &quot;resolution&quot;: 305.748113140558,  &quot;scale&quot;: 1155581.108577   },
+      { &quot;level&quot;: 10, &quot;resolution&quot;: 152.874056570411,  &quot;scale&quot;: 577790.554289    },
+      { &quot;level&quot;: 11, &quot;resolution&quot;: 76.43702828507324, &quot;scale&quot;: 288895.277144    },
+      { &quot;level&quot;: 12, &quot;resolution&quot;: 38.21851414253662, &quot;scale&quot;: 144447.638572    },
+      { &quot;level&quot;: 13, &quot;resolution&quot;: 19.1092570712683,  &quot;scale&quot;: 72223.819286     },
+      { &quot;level&quot;: 14, &quot;resolution&quot;: 9.55462853563415,  &quot;scale&quot;: 36111.909643     },
+      { &quot;level&quot;: 15, &quot;resolution&quot;: 4.77731426794937,  &quot;scale&quot;: 18055.954822     },
+      { &quot;level&quot;: 16, &quot;resolution&quot;: 2.38865713397468,  &quot;scale&quot;: 9027.977411      },
+      { &quot;level&quot;: 17, &quot;resolution&quot;: 1.19432856685505,  &quot;scale&quot;: 4513.988705      }
+    ];
+
+    var lll = [];
+    
+    if ( this.getTheLods() ) {
+      Ext.Array.forEach(this.getTheLods(), function(item, index, theArray) {
+        lll.push(lods[item]);
+      });
+
+      this.setTempLods(lll);
+
+    } else {
+      this.setTempLods(lods);
+    }
+  },
+
+<span id='USGS-common-AGC-method-doSetPopup'>/**     */
+</span>  doSetPopup: function() {  // popup with resize, has default size
+    //    console.log( &#39;popup: &#39;, this.getThePopup() );
+
+    var a = this.getThePopup();
+
+    var popup = esri.dijit.Popup({
+      titleInBody: false,
+        highlight: true
+    }, Ext.Element(document.createElement(&#39;div&#39;)) );
+    
+    if (a) {
+    // console.log(&#39;popup w: &#39;, a.width, &#39;, h: &#39;, a.height);      
+      popup.resize( a.width, a.height); // w,h
+    } else {
+      popup.resize( 200, 150); // w,h
+    }
+
+    this.setThePopup(popup);
+  },
+
+  // &quot;top-right&quot;,&quot;bottom-right&quot;,&quot;top-center&quot;,&quot;bottom-center&quot;,&quot;bottom-left&quot;,&quot;top-left&quot;
+
+<span id='USGS-common-AGC-method-doSetInitExtent'>/**     */  
+</span>  doSetInitExtent: function() {  // set initial map extend or a default 
+    if ( this.getInitialExtent() ) {
+      // new Extent(xmin,ymin,xmax,ymax,spatialReference)
+      var a = this.getInitialExtent();
+      this.setInitialExtent( new esri.geometry.Extent(a.xmin, a.ymin, a.xmax , a.ymax, new esri.SpatialReference({ wkid: 102100})) );
+    } else {
+//      console.log(&#39;no ie &#39;);
+      this.setInitialExtent( new esri.geometry.Extent(-24000000,2100000,-3200000,11000000, new esri.SpatialReference({ wkid: 102100})) );
+    }
+  },
+
+<span id='USGS-common-AGC-method-showScalebar'>/**     */
+</span>  showScalebar: function() {  // add &#39;dual&#39; scalebar to map 
+    var scalebar = new esri.dijit.Scalebar({
+
+        map: this.getArcMap(),
+        attachTo: this.getScaleBar(),
+        scalebarUnit: &quot;dual&quot;
+    });          
+  },
+
+<span id='USGS-common-AGC-method-showOverViewMap'>/**     */
+</span>  showOverViewMap: function() {  // attach OverviewMap to map 
+    var overviewMapDijit = new esri.dijit.OverviewMap({
+        map:this.getArcMap(),
+        visible: false,
+        attachTo: this.getOverViewMap()
+     //     color: &#39;#CECECE&#39;
+    });
+    overviewMapDijit.startup();
+  },
+
+<span id='USGS-common-AGC-method-showLegend'>/**     */
+</span>  showLegend: function() { // add legend to &#39;legendDiv&#39; 
+    //   console.log(&#39;showLegend lw.id: &#39;, lw.getId())
+    var legend = new esri.dijit.Legend({
+        map:this.getArcMap()
+    }, &#39;legendDiv&#39;);
+
+    legend.startup();
+    this.setLegend(legend);
+  },
+
+<span id='USGS-common-AGC-method-setupMyGL'>/**     */
+</span>  setupMyGL: function(map) {  // add a graphics layer to show extent poly 
+    var myGL = new esri.layers.GraphicsLayer({
+      id: &#39;myGL&#39;,
+      opacity: 0.75
+    });
+    map.addLayer(myGL);
+  }
+
+});</pre>
+</body>
+</html>

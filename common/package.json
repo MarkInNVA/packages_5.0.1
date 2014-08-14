@@ -1,0 +1,21 @@
+{
+    "name": "common",
+    "type": "code",
+    "creator": "mreidy@usgs.gov",
+    "summary": "Container wrapper for ArcGIS Javascript API",
+    "detailedDescription": "Container wrapper for ArcGIS Javascript API",
+    "version": "1.0.1",
+    "compatVersion": "1.0.0",
+    "format": "1",
+    "slicer": {
+        "js": [
+            {
+                "path": "${package.dir}/sass/example/custom.js",
+                "isWidgetManifest": true
+            }
+        ]
+    },
+    "output": "${package.dir}/build",
+    "local": true,
+    "requires": []
+}

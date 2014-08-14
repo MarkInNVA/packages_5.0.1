@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;Ext.rtl.tab.Bar&#39;, {
+    override: &#39;Ext.tab.Bar&#39;,
+
+    privates: {
+        adjustTabPositions: function() {
+            var items = this.items.items,
+                i = items.length,
+                tab;
+
+            if (!this.getInherited().rtl) {
+                return this.callParent();
+            }
+
+            // When tabs are rotated vertically we don&#39;t have a reliable way to position
+            // them using CSS in modern browsers.  This is because of the way transform-orign
+            // works - it requires the width to be known, and the width is not known in css.
+            // Consequently we have to make an adjustment to the tab&#39;s position in these browsers.
+            // This is similar to what we do in Ext.panel.Header#adjustTitlePosition
+            if (!Ext.isIE9m) {
+                if (this.dock === &#39;left&#39;) {
+                    // rotated 90 degrees around using the top left corner as the axis.
+                    // tabs need to be shifted to the right by their height
+                    while (i--) {
+                        tab = items[i];
+                        tab.el.setStyle(&#39;right&#39;, -tab.lastBox.height + &#39;px&#39;);
+                    }
+                } else if (this.dock === &#39;right&#39;) {
+                    // rotated 270 degrees around using the top right corner as the axis.
+                    // tabs need to be shifted to the left by their width
+                    while (i--) {
+                        tab = items[i];
+                        tab.el.setStyle(&#39;right&#39;, tab.lastBox.width + &#39;px&#39;);
+                    }
+                }
+            }
+        },
+
+        getCloseXY: function(closeEl, tabX, tabY, tabWidth, tabHeight, closeWidth, closeHeight, direction) {
+            var closeXY, closeX, closeY, xy;
+
+            if (this.isOppositeRootDirection()) {
+                closeXY = closeEl.getXY();
+                if (direction === &#39;right&#39;) {
+                    closeX = tabX + closeXY[1] - tabY;
+                    closeY = tabY + tabHeight - (closeXY[0] - (tabX + tabWidth - tabHeight)) - closeWidth;
+                } else {
+                    closeX = tabX + tabWidth - (closeXY[1] - tabY) - closeHeight;
+                    closeY = tabY + (closeXY[0] - (tabX + tabWidth - tabHeight));
+                }
+                xy = [closeX, closeY];
+            } else {
+                xy = this.callParent(arguments);
+            }
+
+            return xy;
+        }
+    }
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+    "--title": "Sencha DOC's for AGC - ArcGIS Container",
+    "--warnings": ["-link:../ext/src", "-nodoc (member, public):../ext/src", "-nodoc (class, public):../ext/src" ],
+    "--output": "docs",
+    "--": [
+    	"../ext/src",
+        "common/src/"
+    ]
+}
