@@ -60,7 +60,7 @@ Ext.define('USGS.common.ToolbarController', {
     
     /** */
     onMapLoaded: function() {
-         console.log('ToolbarController, onMapLoaded')
+         // console.log('ToolbarController, onMapLoaded')
         this.setTheMap(this.getTheAGC().getArcMap());
         // console.log('ToolbarController, init theMap: ', this.getTheMap());
     },
