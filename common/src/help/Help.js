@@ -30,9 +30,9 @@ Ext.define('USGS.common.Help', {
 /** */ 
     glyph : 0xf129,
 /** */
-    height: 120,
+    height: 225,
 /** */
-    width : 395,
+    width : 390,
 //    bodyPadding: 5,
 /** */
     layout: 'fit',

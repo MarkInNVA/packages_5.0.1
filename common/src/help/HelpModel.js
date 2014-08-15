@@ -14,6 +14,7 @@ Ext.define('USGS.common.HelpModel', {
 /** */     helpHTML: '<ul>' +
                        '<li>Use "+" and "-"  buttons to zoom in and out.</li>'  +
                        '<li>Place cursor on map and drag to change map position.</li>'  +
+                       '<li>Hover cursor over map, hold shift down, click and drag to rubberband new map extext.</li>'  +
                        '<li>Click on Initial Extent button to go back to full map view.</li>'  +
                     '</ul>' 
     }
