@@ -40,59 +40,57 @@ Ext.define(&#39;USGS.common.ToolbarController&#39;, {
 <span id='USGS-common-ToolbarController-property-config'>    /** */
 </span>    config : {
 
-<span id='USGS-common-ToolbarController-cfg-theAGC'>/** Pointer to the AGC */
+<span id='USGS-common-ToolbarController-cfg-theAGC'>        /** Pointer to the AGC */
 </span>        theAGC: null,
 
-<span id='USGS-common-ToolbarController-cfg-theMap'>/** Pointer to the Map */
+<span id='USGS-common-ToolbarController-cfg-theMap'>        /** Pointer to the Map */
 </span>        theMap: null,
 
-<span id='USGS-common-ToolbarController-cfg-theHelp'>/** Pointer to the Help */
+<span id='USGS-common-ToolbarController-cfg-theHelp'>        /** Pointer to the Help */
 </span>        theHelp: null,
 
-<span id='USGS-common-ToolbarController-cfg-theFilter'>/** Pointer to the filter */
+<span id='USGS-common-ToolbarController-cfg-theFilter'>        /** Pointer to the filter */
 </span>        theFilter: null,
 
-<span id='USGS-common-ToolbarController-cfg-theLegendWindow'>/** Pointer to the legend */
+<span id='USGS-common-ToolbarController-cfg-theLegendWindow'>        /** Pointer to the legend */
 </span>        theLegendWindow: null
     },
     
-<span id='USGS-common-ToolbarController-property-listen'>    /** */
-</span>    listen: {
-        controller: {
-            map: {
-                mapready: &#39;onMapLoaded&#39;
-            }
-        }
-    },
-<span id='USGS-common-ToolbarController-method-init'>/** */
+<span id='USGS-common-ToolbarController-method-init'>    /** */
 </span>    init: function() {
-//        console.log(&#39;ToolbarController, init &#39;);
+        // console.log(&#39;ToolbarController, init &#39;);
 
         Ext.setGlyphFontFamily(&#39;FontAwesome&#39;);        
         this.setTheAGC(Ext.ComponentQuery.query(&#39;agc&#39;)[0]);
-        
-        this.setTheHelp( Ext.widget(&#39;help&#39;) );
-//        console.log(&#39;ToolbarController, showHelp - helpHTML: &#39;, this.getHelpHTML() );
 
-//        this.setTheFilter( Ext.widget(&#39;filter&#39;) );
+        //  console.log(&#39;ToolbarController, theAGC: &#39;, this.getTheAGC());
+        this.getTheAGC().on(&quot;mapLoaded&quot;, this.onMapLoaded, this);
+
+        this.setTheHelp( Ext.widget(&#39;help&#39;) );
+        //        console.log(&#39;ToolbarController, showHelp - helpHTML: &#39;, this.getHelpHTML() );
+
+        //        this.setTheFilter( Ext.widget(&#39;filter&#39;) );
 
         // this.setTheLegendWindow( Ext.widget(&#39;legend&#39;) );
         // this.getTheLegendWindow().hide();
     },
-<span id='USGS-common-ToolbarController-method-onMapLoaded'>/** */
+    
+<span id='USGS-common-ToolbarController-method-onMapLoaded'>    /** */
 </span>    onMapLoaded: function() {
-//         console.log(&#39;ToolbarController, onMapLoaded&#39;)
+         // console.log(&#39;ToolbarController, onMapLoaded&#39;)
         this.setTheMap(this.getTheAGC().getArcMap());
         // console.log(&#39;ToolbarController, init theMap: &#39;, this.getTheMap());
     },
-<span id='USGS-common-ToolbarController-method-goInitialExtent'>/** */
-</span>    goInitialExtent: function() {
-//        console.log(&#39;ie: AGC: &#39;, this.lookupReference(&#39;agc&#39;));  
     
-        this.getTheMap().setExtent( this.getTheAGC().getInitialExtent() );
+<span id='USGS-common-ToolbarController-method-goInitialExtent'>    /** */
+</span>    goInitialExtent: function() {
+        // console.log(&#39;ie: AGC: &#39;, this.lookupReference(&#39;agc&#39;));  
+    
+        this.getTheMap().setExtent( this.getTheAGC().getInitialExtent(), this.getTheAGC().getFitExtent() );
         this.fireEvent(&#39;gotoinitialextent&#39;, this.getTheMap() );
     },
-<span id='USGS-common-ToolbarController-method-setBasemap'>/** */
+    
+<span id='USGS-common-ToolbarController-method-setBasemap'>    /** */
 </span>    setBasemap: function (e) {
         // console.log(&#39;setBasemap e: &#39;, e.text);
 
@@ -105,7 +103,8 @@ Ext.define(&#39;USGS.common.ToolbarController&#39;, {
             case &#39;Nat Geo&#39;  : this.getTheMap().setBasemap(&#39;national-geographic&#39;);   break;
         }        
     },
-<span id='USGS-common-ToolbarController-method-showHelp'>/** */
+    
+<span id='USGS-common-ToolbarController-method-showHelp'>    /** */
 </span>    showHelp: function() {
         // console.log(&#39;showHelp&#39;);
 
@@ -115,7 +114,8 @@ Ext.define(&#39;USGS.common.ToolbarController&#39;, {
             this.getTheHelp().show();
         }
     },
-<span id='USGS-common-ToolbarController-method-showLegend'>/** */
+    
+<span id='USGS-common-ToolbarController-method-showLegend'>    /** */
 </span>    showLegend: function() {
         console.log(&#39;showLegend&#39;);
         // if ( this.getTheLegendWindow().isVisible() ) {
@@ -124,16 +124,17 @@ Ext.define(&#39;USGS.common.ToolbarController&#39;, {
         //     this.getTheLegendWindow().show();
         // }
     },
-<span id='USGS-common-ToolbarController-method-showFilter'>/** */
+    
+<span id='USGS-common-ToolbarController-method-showFilter'>    /** */
 </span>    showFilter: function() {
         console.log(&#39;showFilter&#39;);
-// //        this.fireEvent(&#39;showingfilter&#39;);
-        
-//         if ( this.getTheFilter().isVisible() ) {
-//             this.getTheFilter().hide();            
-//         } else {
-//             this.getTheFilter().show();
-//         }
+        // //        this.fireEvent(&#39;showingfilter&#39;);
+                
+        //         if ( this.getTheFilter().isVisible() ) {
+        //             this.getTheFilter().hide();            
+        //         } else {
+        //             this.getTheFilter().show();
+        //         }
     }
 
 });</pre>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='USGS-common-Help'>/**
+</span>* @class USGS.common.Help
+* Help window, shows default help, override with HTML markup
+* 
+*/
+
+Ext.define(&#39;USGS.common.Help&#39;, {
+    extend: &#39;Ext.window.Window&#39;,
+    alias: &#39;widget.help&#39;,
+<span id='USGS-common-Help-property-controller'>/** */
+</span>    controller: &#39;help&#39;,
+
+<span id='USGS-common-Help-property-viewModel'>/** */
+</span>    viewModel: {
+        type: &#39;help&#39;
+    },
+
+<span id='USGS-common-Help-property-bind'>/** */
+</span>    bind: {
+        title: &#39;{name}&#39;
+    },
+
+<span id='USGS-common-Help-property-itemId'>/** */
+</span>    itemId : &#39;help&#39;,
+
+<span id='USGS-common-Help-property-reference'>/** */
+</span>    reference: &#39;help&#39;,
+<span id='USGS-common-Help-property-title'>/** */
+</span>    title : &#39;Help&#39;,
+<span id='USGS-common-Help-property-glyph'>/** */ 
+</span>    glyph : 0xf129,
+<span id='USGS-common-Help-property-height'>/** */
+</span>    height: 225,
+<span id='USGS-common-Help-property-width'>/** */
+</span>    width : 390,
+//    bodyPadding: 5,
+<span id='USGS-common-Help-property-layout'>/** */
+</span>    layout: &#39;fit&#39;,
+<span id='USGS-common-Help-property-closeAction'>/** */
+</span>    closeAction: &#39;hide&#39;,
+
+<span id='USGS-common-Help-property-items'>/** */
+</span>    items: 
+    {
+        xtype: &#39;component&#39;,
+        autoScroll: true,
+  //      bodyPadding: 5,
+        //  autoEl : {
+        //     tag : &quot;iframe&quot;,
+        //     src : &quot;https://sites.google.com/a/usgs.gov/erp-datamanagement/internal-data-resources/well-logs/well-log-web-browser?pli=1&quot;
+        // }
+        bind: {
+            html: &#39;{helpHTML}&#39;
+        }
+    }
+});
+</pre>
+</body>
+</html>

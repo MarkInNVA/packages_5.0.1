@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='USGS-common-HelpController'>/**
+</span>* @class USGS.common.HelpController
+* Help window, shows default help, override with HelpModel.data
+* 
+*/
+
+Ext.define(&#39;USGS.common.HelpController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+<span id='USGS-common-HelpController-property-requires'>/** */
+</span>    requires: [
+        &#39;Ext.layout.container.Fit&#39;
+    ],
+
+    alias: &#39;controller.help&#39;,
+
+<span id='USGS-common-HelpController-property-config'>/** */
+</span>    config:{
+<span id='USGS-common-HelpController-cfg-theHelp'>        theHelp: null // &#39;https://sites.google.com/a/usgs.gov/erp-datamanagement/internal-data-resources/well-logs/well-log-web-browser?pli=1&#39;
+</span>    },
+
+<span id='USGS-common-HelpController-method-init'>/** */
+</span>    init: function() {
+        if ( this.getTheHelp() ) {
+            this.getViewModel().set(&#39;helpHTML&#39;, this.getTheHelp() );
+        }
+ //       this.setTheAGC( Ext.ComponentQuery.query(&#39;agc&#39;)[0] );
+
+//        console.log(&#39;FilterController, init&#39;); // - agc: &#39;, this.getTheAGC() );
+    },
+
+<span id='USGS-common-HelpController-method-formClose'>/** */
+</span>    formClose: function() {
+//        console.log(&#39;FilterController, formClose&#39;);
+        // this.getTheAGC().getThePopup().hide();
+        this.getView().close();
+    }
+
+});</pre>
+</body>
+</html>
